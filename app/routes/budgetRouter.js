@@ -260,6 +260,10 @@ function validateAddExpenseRequestBody(req, res, next) {
         console.log("From server: Invalid request. \'expenseName\' field is missing");
         return res.status(400).send("Missing mandatory field: \'expenseName\'");
     }
+    if (!req.body.remainingAmount) {
+         console.log("From server: Invalid request. \'remainingAmount\' field is missing");
+         return res.status(400).send("Missing mandatory field: \'remainingAmount\'");
+    }
     next();
 };
 
@@ -278,33 +282,58 @@ router.put('/expense/add/:budgetid', validateAddExpenseRequestBody, (req, res) =
 
     // Create new ObjectId for the balance item
     const newExpenseId = new ObjectId();
+    const expenseAccount = req.body.expenseAccount;
+    const expenseType = req.body.expenseType;
+
+    const newExpense = {
+            _id: newExpenseId, // Add the generated Expense Id to the new expense record
+            expenseName: req.body.expenseName,
+            expenseType: req.body.expenseType,
+            plannedAmount: req.body.remainingAmount,
+            paidAmount: req.body.paidAmount,
+            remainingAmount: req.body.remainingAmount,
+            expenseAccount: req.body.expenseAccount
+    };
 
     const db = getDB();
-    db.collection('budgets')
-        .updateOne(
-                { _id: new ObjectId(req.params.budgetid)},
-                { $addToSet: {expenses:
-                    {
-                        _id: newExpenseId, // Add the generated Expense Id to the new expense record
-                        expenseName: req.body.expenseName,
-                        expenseType: req.body.expenseType,
-                        plannedAmount: req.body.plannedAmount,
-                        paidAmount: req.body.paidAmount,
-                        remainingAmount: req.body.remainingAmount,
-                        expenseAccount: req.body.expenseAccount
-                    }
-                  }
+
+    const dynamicFieldName = `balances.$.remainingBalanceAfterExpenses.${req.body.expenseType}`;
+
+    Promise.all([
+        //update expense
+        db.collection('budgets').updateOne(
+            { _id: new ObjectId(req.params.budgetid)},
+            { $addToSet: { expenses: newExpense } }
+        ),
+
+        db.collection('budgets').updateOne(
+            {
+                _id: new ObjectId(req.params.budgetid),
+                'balances.balanceName': expenseAccount
+            },
+            {
+                $inc: {
+                // 'balances.$.remainingBalance': -parseFloat(req.body.remainingAmount || 0)
+                [dynamicFieldName]: -parseFloat(req.body.remainingAmount || 0)
                 }
-            )
-            .then(result => {
-                if (result.modifiedCount === 1) {
-                    const insertedExpenseName = req.body.expenseName;
-                    res.json({insertedExpenseName});
-                } else {
-                    res.send("From server: No budget found or no changes sent for the given ID");
-                }
-            })
-            .catch(error => console.error('From server: Error updating budget:', error));
+            }
+        )
+    ])
+    .then(results => {
+        const expenseResult = results[0];
+        const balanceResult = results[1];
+
+        if (expenseResult.modifiedCount === 1 && balanceResult.modifiedCount === 1) {
+            const insertedExpenseName = req.body.expenseName;
+            res.json({insertedExpenseName});
+        } else {
+            res.status(400).json({ error:"From server: No budget found or no changes sent for the given ID" });
+        }
+    })
+    .catch(error => {
+        console.error('From server: Error updating budget:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    });
 });
 
 //PUT update balance

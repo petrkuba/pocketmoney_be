@@ -43,16 +43,14 @@ mongo
 ```
 --name must be same as the host in DB connection string in Dockerfile ENV
 
-### Run application in docker 
-
-Build docker image from Dockerfile
+### Build docker image from Dockerfile
 - run this command in project root:
 ```
 docker build -t pocketmoney-server:<tag> .
 ```
 
 
-Run application container
+### Run application container
 ```
 docker run -d \
 -p 3001:3001 \
