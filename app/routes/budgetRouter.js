@@ -3,6 +3,11 @@ const router = express.Router();
 const getDB = require ('../db').getDB
 const ObjectId = require('../db').ObjectId
 
+
+
+
+//------- BUDGET APIs ----------//
+
 // Custom middleware function to control the request body in the adding new budget request
 function validateNewBudgetRequestBody(req, res, next) {
 
@@ -32,8 +37,6 @@ function validateUpdatedBudgetRequestBody(req, res, next) {
   next();
 }
 
-
-//------- BUDGET APIs ----------//
 
 // GET list of budgets
 router.get('/list', (req,res) => {
