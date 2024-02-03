@@ -2,7 +2,8 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 const budgetRouter = require ('./routes/budgetRouter')
-const balanceRouter = require ('./routes/balanceRouter')
+const mockRouter = require ('./routes/mockRouter')
+const configRouter = require ('./routes/configRouter')
 const mongoConnect = require ('./db').mongoConnect
 
 app.use(cors());
@@ -10,7 +11,8 @@ app.use(express.json());
 
 //routes
 app.use('/budget', budgetRouter)
-//app.use('/budget/balance', balanceRouter)
+app.use('/mock', mockRouter)
+app.use('/config', configRouter)
 app.use('/', (req, res) =>
     res.send('Welcome to PocketMoney application')
 )

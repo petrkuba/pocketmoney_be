@@ -37,6 +37,9 @@ function validateUpdatedBudgetRequestBody(req, res, next) {
   next();
 }
 
+router.get('/mock',(req,res) => {
+    res.send("this is mock");
+})
 
 // GET list of budgets
 router.get('/list', (req,res) => {
