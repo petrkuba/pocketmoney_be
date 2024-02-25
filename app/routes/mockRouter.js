@@ -180,12 +180,12 @@ const mockedBudget = {
     "balances": [
         {
             "_id": {
-                "$oid": "6578602bc39cbdbbbd010c88"
+                "$oid": "6578602bc39cbdbbbd0108"
             },
             "account": "Unicredit",
             "plannedBalance": 20000,
             "currentBalance": 15000,
-            "remainingBalancesAfterExpenses": [
+            "remainingBalancesAfter": [
                 {
                     "expenseType": "Tax",
                     "amount": 1500,
@@ -206,12 +206,12 @@ const mockedBudget = {
         },
         {
             "_id": {
-                "$oid": "6578602bc39cbdbbbd010c88"
+                "$oid": "65786bc39cbdbbbd010c88"
             },
             "account": "Revolut",
             "currentBalance": 15000,
             "plannedBalance": 10000,
-            "remainingBalancesAfterExpenses": [
+            "remainingBalancesAfter": [
                 {
                     "expenseType": "Tax",
                     "amount": 8000,
@@ -232,7 +232,7 @@ const mockedBudget = {
         },
         {
             "_id": {
-                "$oid": "6578602bc39cbdbbbd010c88"
+                "$oid": "6578602bc39cbbbd010c88"
             },
             "account": "Kreditka",
             "currentBalance": 10000,
