@@ -33,6 +33,29 @@ function validateUpdatedBudgetRequestBody(req, res, next) {
   next();
 }
 
+function getPlannedBalanceSum(balancesObject) {
+         let sum = 0;
+         for(const balance of balancesObject) {
+             if(typeof balance.plannedBalance === 'number') {
+                 sum += balance.plannedBalance;
+             } else if (!isNaN(parseFloat(balance.plannedBalance))) {
+                 sum += parseFloat(balance.plannedBalance);
+             }
+         }
+         return sum;
+}
+
+function getRemainingBalanceSum(balancesObject) {
+    let sum = 0;
+        for(const balance of balancesObject) {
+            if(typeof balance.currentBalance === 'number') {
+                sum += balance.currentBalance;
+            } else if (!isNaN(parseFloat(balance.currentBalance))) {
+                sum += parseFloat(balance.currentBalance);
+            }
+        }
+        return sum;
+}
 
 // GET list of budgets
 router.get('/list', (req,res) => {
@@ -58,7 +81,24 @@ router.get ('/:id', (req, res) => {
                 if (results[0] === undefined) {
                     res.send("From server: No budget found")
                 }
-               res.json(results[0])
+
+                let modifiedResponse = {...results[0]};
+
+                //adding balancesSums object to the response JSON
+                if (results[0].balances) {
+                    const plannedBalanceSum = getPlannedBalanceSum(results[0].balances);
+                    const remainingBalanceSum = getRemainingBalanceSum(results[0].balances);
+
+                    modifiedResponse = {
+                        ...results[0],
+                        "balancesSums": {
+                            "plannedBalanceSum": plannedBalanceSum,
+                            "remainingBalanceSum": remainingBalanceSum
+                        }
+                    }
+                }
+
+               res.json(modifiedResponse)
            })
            .catch(error => console.error(error))
 })
@@ -111,6 +151,5 @@ router.delete('/delete/:id', (req, res) => {
       res.status(500).json({ error: 'From server: Error deleting budget' });
     });
 });
-
 
 module.exports = router;
