@@ -7,8 +7,8 @@ function validateAddBalanceRequestBody(req, res, next) {
 
     //check if the request body contains name
     if(!req.body.account) {
-        console.log("From server: Invalid add balance request. \'balanceName\' field is missing in the request ");
-        return res.status(400).send('Missing mandatory field: \'balanceName\'');
+        console.log("From server: Invalid add balance request. \'account\' field is missing in the request ");
+        return res.status(400).send('Missing mandatory field: \'account\'');
     }
     //TODO check if the balance name is unique
     next();

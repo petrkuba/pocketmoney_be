@@ -34,7 +34,7 @@ function validateUpdatedBudgetRequestBody(req, res, next) {
 }
 
 function getPlannedBalanceSum(balancesObject) {
-         let sum = 0;
+    let sum = 0;
          for(const balance of balancesObject) {
              if(typeof balance.plannedBalance === 'number') {
                  sum += balance.plannedBalance;
@@ -42,7 +42,7 @@ function getPlannedBalanceSum(balancesObject) {
                  sum += parseFloat(balance.plannedBalance);
              }
          }
-         return sum;
+    return sum;
 }
 
 function getRemainingBalanceSum(balancesObject) {
@@ -54,7 +54,27 @@ function getRemainingBalanceSum(balancesObject) {
                 sum += parseFloat(balance.currentBalance);
             }
         }
-        return sum;
+    return sum;
+}
+
+function getCumulativeRemainingTotalBalanceAfterTax() {
+    let sum = 9999;
+    return sum;
+}
+
+function getCumulativeRemainingTotalBalanceAfterTaxMandatory() {
+    let sum = 8888;
+    return sum;
+}
+
+function getCumulativeRemainingTotalBalanceAfterTaxMandatoryMust() {
+    let sum = 7777;
+    return sum;
+}
+
+function getCumulativeRemainingTotalBalanceAfterTaxMandatoryMustOthers() {
+    let sum = 6666;
+    return sum;
 }
 
 // GET list of budgets
@@ -89,14 +109,31 @@ router.get ('/:id', (req, res) => {
                     const plannedBalanceSum = getPlannedBalanceSum(results[0].balances);
                     const remainingBalanceSum = getRemainingBalanceSum(results[0].balances);
 
-                    modifiedResponse = {
-                        ...results[0],
-                        "balancesSums": {
-                            "plannedBalanceSum": plannedBalanceSum,
-                            "remainingBalanceSum": remainingBalanceSum
+
+                    modifiedResponse.balancesSums = {
+                        "plannedBalanceSum": plannedBalanceSum,
+                        "remainingBalanceSum": remainingBalanceSum
+                    }
+                }
+
+                //adding cumulative remaining balances after particular expense types
+                if (results[0].expenses) {
+                    const cumulativeRemainingTotalBalanceAfterTax = getCumulativeRemainingTotalBalanceAfterTax();
+                    const cumulativeRemainingTotalBalanceAfterTaxMandatory = getCumulativeRemainingTotalBalanceAfterTaxMandatory();
+                    const cumulativeRemainingTotalBalanceAfterTaxMandatoryMust = getCumulativeRemainingTotalBalanceAfterTaxMandatoryMust();
+                    const cumulativeRemainingTotalBalanceAfterTaxMandatoryMustOthers = getCumulativeRemainingTotalBalanceAfterTaxMandatoryMustOthers();
+
+
+                    modifiedResponse.cumulativeRemainingBalances = {
+                        "total": {
+                            "afterTax": cumulativeRemainingTotalBalanceAfterTax,
+                            "afterTaxMandatory": cumulativeRemainingTotalBalanceAfterTaxMandatory,
+                            "afterTaxMandatoryMust": cumulativeRemainingTotalBalanceAfterTaxMandatoryMust,
+                            "afterTaxMandatoryMustOthers": cumulativeRemainingTotalBalanceAfterTaxMandatoryMustOthers
                         }
                     }
                 }
+
 
                res.json(modifiedResponse)
            })
