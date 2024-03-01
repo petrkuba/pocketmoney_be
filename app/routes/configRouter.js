@@ -5,7 +5,6 @@ const ObjectId = require('../db').ObjectId
 const config = require('../config.js')
 
 
-
 router.get('/expense-types', (req, res) => {
     res.json(config.expenseTypes);
 })
