@@ -57,8 +57,9 @@ function getRemainingBalanceSum(balancesObject) {
     return sum;
 }
 
-function getCumulativeRemainingTotalBalanceAfterTax() {
-    let sum = 9999;
+function getCumulativeRemainingTotalBalanceAfterTax(remainingBalance, expenses) {
+    let sum = 0;
+
     return sum;
 }
 
@@ -133,8 +134,6 @@ router.get ('/:id', (req, res) => {
                         }
                     }
                 }
-
-
                res.json(modifiedResponse)
            })
            .catch(error => console.error(error))
