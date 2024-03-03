@@ -40,14 +40,14 @@ router.put('/add/:budgetid', validateAddExpenseRequestBody, (req, res) => {
         expenseName: req.body.expenseName,
         expenseType: req.body.expenseType,
         plannedAmount: req.body.remainingAmount,
-        paidAmount: req.body.paidAmount,
         remainingAmount: req.body.remainingAmount,
+        paidAmount: req.body.paidAmount,
         expenseAccount: req.body.expenseAccount
     };
 
     const db = getDB();
 
-    const dynamicFieldName = `balances.$.remainingBalanceAfterExpenses.${req.body.expenseType}`;
+//    const dynamicFieldName = `balances.$.remainingBalanceAfterExpenses.${req.body.expenseType}`;
 
     Promise.all([
         //update expense
@@ -56,7 +56,7 @@ router.put('/add/:budgetid', validateAddExpenseRequestBody, (req, res) => {
             { $addToSet: { expenses: newExpense } }
         ),
 
-        db.collection('budgets').updateOne(
+    /*    db.collection('budgets').updateOne(
             {
                 _id: new ObjectId(req.params.budgetid),
                 $or: [
@@ -64,19 +64,22 @@ router.put('/add/:budgetid', validateAddExpenseRequestBody, (req, res) => {
                     {'balances.account' : expenseAccount}
                 ]
             },
-            {
+           {
                 $inc: {
                     // 'balances.$.remainingBalance': -parseFloat(req.body.remainingAmount || 0)
                     [dynamicFieldName]: -parseFloat(req.body.remainingAmount || 0)
                 }
             }
+
         )
+    */
     ])
         .then(results => {
             const expenseResult = results[0];
-            const balanceResult = results[1];
+       //     const balanceResult = results[1];
 
-            if (expenseResult.modifiedCount === 1 && balanceResult.modifiedCount === 1) {
+       //     if (expenseResult.modifiedCount === 1 && balanceResult.modifiedCount === 1) {
+              if (expenseResult.modifiedCount === 1) {
                 const insertedExpenseName = req.body.expenseName;
                 res.json({insertedExpenseName});
                 console.log(insertedExpenseName);

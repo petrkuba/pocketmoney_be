@@ -58,7 +58,7 @@ function getRemainingBalanceSum(balancesObject) {
     return sum;
 }
 
-function getCumulativeRemainingTotalBalanceAfterTax(remainingBalance, expenses) {
+function getCumulativeRemainingBalanceAfterTax(remainingBalance, expenses) {
 
     let remainingTaxExpenses = 0;
 
@@ -74,10 +74,10 @@ function getCumulativeRemainingTotalBalanceAfterTax(remainingBalance, expenses) 
     return remainingBalance - remainingTaxExpenses;
 }
 
-function getCumulativeRemainingTotalBalanceAfterTaxMandatory(remainingBalance, expenses) {
+function getCumulativeRemainingBalanceAfterTaxMandatory(remainingBalance, expenses) {
 
     let remainingMandatoryExpenses = 0;
-    let remainingBalanceAfterTax = getCumulativeRemainingTotalBalanceAfterTax(remainingBalance, expenses);
+    let remainingBalanceAfterTax = getCumulativeRemainingBalanceAfterTax(remainingBalance, expenses);
     let remainingBalanceAfterTaxMandatory = 0
 
     const mandatoryExpenses = expenses.filter(expense => expense.expenseType === 'Mandatory');
@@ -95,14 +95,45 @@ function getCumulativeRemainingTotalBalanceAfterTaxMandatory(remainingBalance, e
     return remainingBalanceAfterTaxMandatory;
 }
 
-function getCumulativeRemainingTotalBalanceAfterTaxMandatoryMust() {
-    let sum = 7777;
-    return sum;
+function getCumulativeRemainingBalanceAfterTaxMandatoryMust(remainingBalance, expenses) {
+
+    let remainingMustExpenses = 0;
+    let remainingBalanceAfterTaxMandatory = getCumulativeRemainingBalanceAfterTaxMandatory(remainingBalance, expenses);
+    let remainingBalanceAfterTaxMandatoryMust = 0
+
+    const mustExpenses = expenses.filter(expense => expense.expenseType === 'Must');
+
+      for(const expense of mustExpenses) {
+          if(typeof expense.remainingAmount === 'number') {
+              remainingMustExpenses += expense.remainingAmount;
+          } else if (!isNaN(parseFloat(expense.remainingAmount))) {
+              remainingMustExpenses += parseFloat(expense.remainingAmount);
+          }
+      }
+
+    remainingBalanceAfterTaxMandatoryMust = remainingBalanceAfterTaxMandatory - remainingMustExpenses
+
+    return remainingBalanceAfterTaxMandatoryMust;
 }
 
-function getCumulativeRemainingTotalBalanceAfterTaxMandatoryMustOthers() {
-    let sum = 6666;
-    return sum;
+function getCumulativeRemainingBalanceAfterTaxMandatoryMustOthers(remainingBalance, expenses) {
+    let remainingOtherExpenses = 0;
+    let remainingBalanceAfterTaxMandatoryMust = getCumulativeRemainingBalanceAfterTaxMandatoryMust(remainingBalance, expenses);
+    let remainingBalanceAfterTaxMandatoryMustOthers = 0
+
+    const otherExpenses = expenses.filter(expense => expense.expenseType === 'Other');
+
+      for(const expense of otherExpenses) {
+          if(typeof expense.remainingAmount === 'number') {
+              remainingOtherExpenses += expense.remainingAmount;
+          } else if (!isNaN(parseFloat(expense.remainingAmount))) {
+              remainingOtherExpenses += parseFloat(expense.remainingAmount);
+          }
+      }
+
+    remainingBalanceAfterTaxMandatoryMustOther = remainingBalanceAfterTaxMandatoryMust - remainingOtherExpenses
+
+    return remainingBalanceAfterTaxMandatoryMustOther;
 }
 
 // GET list of budgets
@@ -133,7 +164,7 @@ router.get ('/:id', (req, res) => {
                 let remainingBalanceSum = 0;
                 let modifiedResponse = {...results[0]};
 
-                //adding balancesSums object to the response JSON
+                //adding balancesSums object
                 if (results[0].balances) {
                     const plannedBalanceSum = getPlannedBalanceSum(results[0].balances);
                     remainingBalanceSum += getRemainingBalanceSum(results[0].balances);
@@ -144,24 +175,45 @@ router.get ('/:id', (req, res) => {
                     }
                 }
 
-                //adding cumulative remaining balances after particular expense types
+                //adding cumulative remaining total balances
                 if (results[0].expenses) {
-                    const cumulativeRemainingTotalBalanceAfterTax = getCumulativeRemainingTotalBalanceAfterTax(remainingBalanceSum, results[0].expenses);
-                    const cumulativeRemainingTotalBalanceAfterTaxMandatory = getCumulativeRemainingTotalBalanceAfterTaxMandatory(remainingBalanceSum, results[0].expenses);
-                    const cumulativeRemainingTotalBalanceAfterTaxMandatoryMust = getCumulativeRemainingTotalBalanceAfterTaxMandatoryMust(remainingBalanceSum, results[0].expenses);
-                    const cumulativeRemainingTotalBalanceAfterTaxMandatoryMustOthers = getCumulativeRemainingTotalBalanceAfterTaxMandatoryMustOthers(remainingBalanceSum, results[0].expenses);
+                    const cumulativeRemainingTotalBalanceAfterTax = getCumulativeRemainingBalanceAfterTax(remainingBalanceSum, results[0].expenses);
+                    const cumulativeRemainingTotalBalanceAfterTaxMandatory = getCumulativeRemainingBalanceAfterTaxMandatory(remainingBalanceSum, results[0].expenses);
+                    const cumulativeRemainingTotalBalanceAfterTaxMandatoryMust = getCumulativeRemainingBalanceAfterTaxMandatoryMust(remainingBalanceSum, results[0].expenses);
+                    const cumulativeRemainingTotalBalanceAfterTaxMandatoryMustOthers = getCumulativeRemainingBalanceAfterTaxMandatoryMustOthers(remainingBalanceSum, results[0].expenses);
 
-
-                    modifiedResponse.cumulativeRemainingBalances = {
-                        "total": {
+                    modifiedResponse.balancesSums['remainingBalances'] = {
                             "afterTax": cumulativeRemainingTotalBalanceAfterTax,
                             "afterTaxMandatory": cumulativeRemainingTotalBalanceAfterTaxMandatory,
                             "afterTaxMandatoryMust": cumulativeRemainingTotalBalanceAfterTaxMandatoryMust,
                             "afterTaxMandatoryMustOthers": cumulativeRemainingTotalBalanceAfterTaxMandatoryMustOthers
-                        }
                     }
                 }
-               res.json(modifiedResponse)
+
+               //adding cumulative remaining balances for each account
+               if (results[0].balances && results[0].expenses) {
+
+                    results[0].balances.forEach((balance) => {
+
+                         //vyfitlruj všechny expenses se patřící k danému účtu
+                         const filteredExpenses = results[0].expenses.filter((expense) => expense.expenseAccount === balance.account || expense.expenseAccount === balance.balanceName);
+                         //console.log(balance.account || balance.balanceName, filteredExpenses);
+
+                          const cumulativeRemainingBalanceAfterTax = getCumulativeRemainingBalanceAfterTax(balance.currentBalance, filteredExpenses);
+                          const cumulativeRemainingBalanceAfterTaxMandatory = getCumulativeRemainingBalanceAfterTaxMandatory(balance.currentBalance, filteredExpenses);
+                          const cumulativeRemainingBalanceAfterTaxMandatoryMust = getCumulativeRemainingBalanceAfterTaxMandatoryMust(balance.currentBalance, filteredExpenses);
+                          const cumulativeRemainingBalanceAfterTaxMandatoryMustOthers = getCumulativeRemainingBalanceAfterTaxMandatoryMustOthers(balance.currentBalance, filteredExpenses);
+
+                          balance.remainingBalanceAfterTax = cumulativeRemainingBalanceAfterTax;
+                          balance.remainingBalanceAfterTaxMandatory = cumulativeRemainingBalanceAfterTaxMandatory;
+                          balance.remainingBalanceAfterTaxMandatoryMust = cumulativeRemainingBalanceAfterTaxMandatoryMust;
+                          balance.remainingBalanceAfterTaxMandatoryMustOthers = cumulativeRemainingBalanceAfterTaxMandatoryMustOthers;
+
+                    });
+
+               }
+
+                res.json(modifiedResponse)
            })
            .catch(error => console.error(error))
 })
