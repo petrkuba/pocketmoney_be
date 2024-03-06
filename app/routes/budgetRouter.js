@@ -176,7 +176,7 @@ router.get ('/:id', (req, res) => {
                 }
 
                 //adding cumulative remaining total balances
-                if (results[0].expenses) {
+                if (results[0].expenses && modifiedResponse.balancesSums) {
                     const cumulativeRemainingTotalBalanceAfterTax = getCumulativeRemainingBalanceAfterTax(remainingBalanceSum, results[0].expenses);
                     const cumulativeRemainingTotalBalanceAfterTaxMandatory = getCumulativeRemainingBalanceAfterTaxMandatory(remainingBalanceSum, results[0].expenses);
                     const cumulativeRemainingTotalBalanceAfterTaxMandatoryMust = getCumulativeRemainingBalanceAfterTaxMandatoryMust(remainingBalanceSum, results[0].expenses);
@@ -197,7 +197,6 @@ router.get ('/:id', (req, res) => {
 
                          //vyfitlruj všechny expenses se patřící k danému účtu
                          const filteredExpenses = results[0].expenses.filter((expense) => expense.expenseAccount === balance.account || expense.expenseAccount === balance.balanceName);
-                         //console.log(balance.account || balance.balanceName, filteredExpenses);
 
                           const cumulativeRemainingBalanceAfterTax = getCumulativeRemainingBalanceAfterTax(balance.currentBalance, filteredExpenses);
                           const cumulativeRemainingBalanceAfterTaxMandatory = getCumulativeRemainingBalanceAfterTaxMandatory(balance.currentBalance, filteredExpenses);

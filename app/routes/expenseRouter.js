@@ -82,7 +82,6 @@ router.put('/add/:budgetid', validateAddExpenseRequestBody, (req, res) => {
               if (expenseResult.modifiedCount === 1) {
                 const insertedExpenseName = req.body.expenseName;
                 res.json({insertedExpenseName});
-                console.log(insertedExpenseName);
             } else {
                 res.status(400).json({ error:"From server: No budget found or no changes sent for the given ID" });
             }
