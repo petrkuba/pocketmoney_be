@@ -46,7 +46,7 @@ mongo
 ### Build docker image from Dockerfile
 - run this command in project root:
 ```
-docker build -t pocketmoney-server:<tag> .
+docker build -f be.Dockerfile -t pocketmoney-server:<tag> .
 ```
 
 
