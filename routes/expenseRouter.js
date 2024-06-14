@@ -27,14 +27,14 @@ function validateDeleteUpdateExpenseRequestBody(req, res, next) {
     next();
 };
 
-//PUT add new expense
+//New
 router.put('/add/:budgetid', validateAddExpenseRequestBody, (req, res) => {
 
-    // Create new ObjectId for the balance item
-    const newExpenseId = new ObjectId();
+    const newExpenseId = new ObjectId(); //new ObjectId for the expense item
     const expenseAccount = req.body.expenseAccount;
     const expenseType = req.body.expenseType;
 
+    //new object to be saved
     const newExpense = {
         _id: newExpenseId, // Add the generated Expense Id to the new expense record
         expenseName: req.body.expenseName,
@@ -92,7 +92,7 @@ router.put('/add/:budgetid', validateAddExpenseRequestBody, (req, res) => {
         });
 });
 
-//PUT update balance
+//Update
 router.put('/update/:budgetid', validateDeleteUpdateExpenseRequestBody, (req, res) => {
     const db = getDB();
 
@@ -100,12 +100,12 @@ router.put('/update/:budgetid', validateDeleteUpdateExpenseRequestBody, (req, re
     //mapping received fields to be updated to variables
     const { expenseId, expenseName, expenseType, plannedAmount, paidAmount, remainingAmount, expenseAccount } = req.body;
 
-    //check budgetId format
+    //validate budgetId format
     if(!ObjectId.isValid(budgetId)) {
         return res.status(400).json({ error: 'Invalid budgetId format' });
     }
 
-    //check expense ID format
+    //validate expense ID format
     if(!ObjectId.isValid(expenseId)) {
         return res.status(400).json({ error: 'Invalid expenseId format' });
     }
@@ -148,7 +148,7 @@ router.put('/update/:budgetid', validateDeleteUpdateExpenseRequestBody, (req, re
         .catch(error => console.error('From server: Error updating balance:', error));
 });
 
-//PUT delete balance
+//Delete
 router.put('/delete/:budgetid', validateDeleteUpdateExpenseRequestBody, (req, res) => {
 
     //save received expense and budget IDs into variables

@@ -136,7 +136,7 @@ function getCumulativeRemainingBalanceAfterTaxMandatoryMustOthers(remainingBalan
     return remainingBalanceAfterTaxMandatoryMustOther;
 }
 
-// GET list of budgets
+//List
 router.get('/list', (req,res) => {
        const db = getDB();
        db.collection('budgets')
@@ -148,7 +148,7 @@ router.get('/list', (req,res) => {
            .catch(error => console.error(error))
 })
 
-// GET budget detail
+//Detail
 router.get ('/:id', (req, res) => {
        const db = getDB();
        //id z url se musí převést na ObjectId, aby se podle něj dalo vyhledávat
@@ -217,7 +217,7 @@ router.get ('/:id', (req, res) => {
            .catch(error => console.error(error))
 })
 
-//POST create new budget
+//New
 router.post('/new', validateNewBudgetRequestBody, (req, res) => {
     const newBudget = req.body;
     const db = getDB();
@@ -230,7 +230,7 @@ router.post('/new', validateNewBudgetRequestBody, (req, res) => {
         .catch(error => console.error('Error inserting budget', error));
 })
 
-//PUT update budget
+//Update
 router.put('/update/:id', validateUpdatedBudgetRequestBody, (req, res) => {
     const { id } = req.params;
     const updatedName = req.body.name;
@@ -250,7 +250,7 @@ router.put('/update/:id', validateUpdatedBudgetRequestBody, (req, res) => {
         .catch(error => console.error('From server: Error updating budget:', error));
 });
 
-//DELETE budget
+//Delete
 router.delete('/delete/:id', (req, res) => {
   const budgetId = req.params.id;
   const db = getDB();
