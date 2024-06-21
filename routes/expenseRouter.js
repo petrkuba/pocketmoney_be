@@ -47,8 +47,6 @@ router.put('/add/:budgetid', validateAddExpenseRequestBody, (req, res) => {
 
     const db = getDB();
 
-//    const dynamicFieldName = `balances.$.remainingBalanceAfterExpenses.${req.body.expenseType}`;
-
     Promise.all([
         //update expense
         db.collection('budgets').updateOne(
@@ -56,29 +54,9 @@ router.put('/add/:budgetid', validateAddExpenseRequestBody, (req, res) => {
             { $addToSet: { expenses: newExpense } }
         ),
 
-    /*    db.collection('budgets').updateOne(
-            {
-                _id: new ObjectId(req.params.budgetid),
-                $or: [
-                    {'balances.balanceName' : expenseAccount},
-                    {'balances.account' : expenseAccount}
-                ]
-            },
-           {
-                $inc: {
-                    // 'balances.$.remainingBalance': -parseFloat(req.body.remainingAmount || 0)
-                    [dynamicFieldName]: -parseFloat(req.body.remainingAmount || 0)
-                }
-            }
-
-        )
-    */
     ])
         .then(results => {
             const expenseResult = results[0];
-       //     const balanceResult = results[1];
-
-       //     if (expenseResult.modifiedCount === 1 && balanceResult.modifiedCount === 1) {
               if (expenseResult.modifiedCount === 1) {
                 const insertedExpenseName = req.body.expenseName;
                 res.json({insertedExpenseName});

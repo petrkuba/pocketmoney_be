@@ -3,6 +3,7 @@ const router = express.Router();
 const getDB = require ('../db').getDB
 const ObjectId = require('../db').ObjectId
 const config = require('../config.js')
+const { v4: uuidv4 } = require('uuid');
 
 
 // Custom middleware function to control the request body in the adding new budget request
@@ -136,6 +137,8 @@ function getCumulativeRemainingBalanceAfterTaxMandatoryMustOthers(remainingBalan
     return remainingBalanceAfterTaxMandatoryMustOther;
 }
 
+function getMandatoryExpenses(){};
+
 //List
 router.get('/list', (req,res) => {
        const db = getDB();
@@ -190,8 +193,8 @@ router.get ('/:id', (req, res) => {
                     }
                 }
 
-               //adding cumulative remaining balances for each account
-               if (results[0].balances && results[0].expenses) {
+                //adding cumulative remaining balances for each account
+                if (results[0].balances && results[0].expenses) {
 
                     results[0].balances.forEach((balance) => {
 
@@ -213,22 +216,62 @@ router.get ('/:id', (req, res) => {
                }
 
                 res.json(modifiedResponse)
+
            })
            .catch(error => console.error(error))
 })
 
 //New
 router.post('/new', validateNewBudgetRequestBody, (req, res) => {
-    const newBudget = req.body;
+
     const db = getDB();
-    db.collection('budgets')
-        .insertOne(newBudget)
-        .then(result => {
-            const insertedId = result.insertedId;
-            res.json({ insertedId });
-        })
-        .catch(error => console.error('Error inserting budget', error));
-})
+
+    const newBudget = {
+      name: req.body.name
+    };
+
+    if(req.body.addMandatoryExpenses) {
+
+      db.collection('mandatoryExpenses')
+           .find({}, {projection:{_id:0, expenseName:1, expenseAmount:1, expenseAccount:1}})
+           .toArray()
+           .then(results => {
+                if(results.length > 0) {
+                    newBudget.expenses = results.map(item => ({
+                         _id: new ObjectId(),
+                          expenseName: item.expenseName,
+                          remainingAmount: item.expenseAmount,
+                          expenseAccount: item.expenseAccount,
+                          expenseType: "Mandatory"
+                    }));
+                } else {
+                    console.log("No items found in the database");
+                }
+
+                return db.collection('budgets').insertOne(newBudget);
+           })
+           .then(result => {
+                const insertedId = result.insertedId;
+                res.json({ insertedId });
+           })
+           .catch(error => {
+                console.error('Error inserting budget', error);
+                res.status(500).json({ error: 'An error occurred while inserting the budget' });
+           });
+    } else {
+        db.collection('budgets')
+            .insertOne(newBudget)
+            .then(result => {
+                const insertedId = result.insertedId;
+                res.json({ insertedId });
+            })
+            .catch(error => {
+                console.error('Error inserting budget', error);
+                res.status(500).json({ error: 'An error occurred while inserting the budget' });
+            });
+    }
+
+});
 
 //Update
 router.put('/update/:id', validateUpdatedBudgetRequestBody, (req, res) => {
