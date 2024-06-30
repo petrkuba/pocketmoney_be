@@ -151,6 +151,35 @@ components:
           description: List of expected expenses in the budget
           items:
             $ref: '#components/schemas/BudgetExpense'
+        balancesSums:
+          $ref: '#components/schemas/BudgetBalancesSums'
+
+    BudgetBalancesSums:
+      type: object
+      description: Sums of planned and remaining balances over all accounts.
+      properties:
+        plannedBalanceSum:
+          type: integer
+          description: Sum of all planned balances from all the accounts
+        remainingBalanceSum:
+          type: integer
+          description: Sum of all remaining balances from all the accounts
+        remainingBalances:
+          type: object
+          description: Sum of remaining balances grouped by expense types
+          properties:
+            afterTax:
+              type: integer
+              description: Sum of overall remaining balance after Tax expenses
+            afterTaxMandatory:
+              type: integer
+              description: Sum of overall remaining balance after Tax and Mandatory expenses
+            afterTaxMandatoryMust:
+              type: integer
+              description: Sum of overall remaining balances after Tax, Mandatory and Must expenses
+            afterTaxMandatoryMustOthers:
+              type: integer
+              description: Sum of overall remaining balances after Tax, Mandatory, Must and Others expenses
 
     BudgetExpense:
       type: object
@@ -200,6 +229,18 @@ components:
         plannedBalance:
           type: integer
           description: Planned balance at the beginning of the budget period
+        remainingBalanceAfterTax:
+          type: integer
+          description: Remaining balance of the account after remaining amount of Tax expenses
+        remainingBalanceAfterTaxMandatory:
+          type: integer
+          description: Remaining balance of the account after remaining amount of Tax and Mandatory expenses
+        remainingBalanceAfterTaxMandatoryMust:
+          type: integer
+          description: Remaining balance of the account after remaining amount of Tax, Mandatory and Must expenses
+        remainingBalanceAfterTaxMandatoryMustOthers:
+          type: integer
+          description: Remaining balance of the account after remaining amount of Tax, Mandatory, Must and Others expenses
 
   requestBodies:
     NewBudget:
