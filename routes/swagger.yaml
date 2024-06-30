@@ -64,7 +64,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#components/requestBodies/NewBudget'
+              $ref: '#components/schemas/NewBudget'
       responses:
         200:
           description: Success
@@ -88,7 +88,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#components/requestBodies/UpdateBudget'
+              $ref: '#components/schemas/UpdateBudget'
       responses:
         200:
           description: Success
@@ -111,6 +111,216 @@ paths:
         200:
           description: Success
 
+  /budget/balance/add/{budgetid}:
+    put:
+      summary: Add new balance to the budget
+      tags:
+        - budget balance
+      parameters:
+        - in: path
+          name: budgetid
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the budget into which is the balance being added
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                account:
+                  type: string
+                  description: Balance account
+                  enum: [Unicredit, Revolut, Kreditka, Hotovost]
+                currentBalance:
+                  type: integer
+                  description: Actual balance on the account
+                plannedBalance:
+                  type: integer
+                  description: Account balance which was planned at the beginning of the budget period
+      responses:
+        200:
+          description: Success
+
+  /budget/balance/update/{budgetid}:
+    put:
+      summary: Update budget balance
+      tags:
+        - budget balance
+      parameters:
+        - in: path
+          name: budgetid
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the budget in which the balance is being updated
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                balanceId:
+                  type: string
+                  description: ID of the balance being updated
+                balanceName:
+                  type: string
+                  description: Account of the balance
+                  enum: [Unicredit, Revolut, Kreditka, Hotovost]
+                currentBalance:
+                  type: integer
+                  description: Actual account balance
+                plannedBalance:
+                  type: integer
+                  description: Actual balance planned at the beginning of the budget period
+      responses:
+        200:
+          description: Success
+
+  /budget/balance/delete/{budgetid}:
+    put:
+      summary: Delete budget balance
+      tags:
+        - budget balance
+      parameters:
+        - in: path
+          name: budgetid
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the budget in which the balance is being deleted
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                balanceId:
+                  type: string
+                  description: ID of the balance being deleted
+      responses:
+        200:
+          description: Success
+
+  /budget/expense/add/{budgetid}:
+    put:
+      summary: Add budget expense
+      tags:
+        - budget expense
+      parameters:
+        - in: path
+          name: budgetid
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the budget into which the expense is being added
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                expenseAccount:
+                  type: string
+                  description: Account from which the expense will be paid
+                  enum: [Unicredit, Revolut, Kreditka, Hotovost]
+                expenseName:
+                  type: string
+                  description: Name of the expense
+                expenseType:
+                  type: string
+                  description: Type of the expense
+                  enum: [Tax, Mandatory, Must, Others]
+                paidAmount:
+                  type: integer
+                  description: Amount of the expense which was already paid
+                plannedAmount:
+                  type: integer
+                  description: Amount of the expense planned at the beginning of the budget period
+                remainingAmount:
+                  type: integer
+                  description: Remaining amount of the expense. It is changing as the expense is being paid during the budget period.
+      responses:
+        200:
+          description: Success
+
+  /budget/expense/update/{budgetid}:
+    put:
+      summary: Update budget expense
+      tags:
+        - budget expense
+      parameters:
+        - in: path
+          name: budgetid
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the budget in which the expense is being updated
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                expenseId:
+                  type: string
+                  description: ID of the expense being updated
+                expenseAccount:
+                  type: string
+                  description: Account from which the expense will be paid
+                  enum: [Unicredit, Revolut, Kreditka, Hotovost]
+                expenseName:
+                  type: string
+                  description: Name of the expense
+                expenseType:
+                  type: string
+                  description: Type of the expense
+                  enum: [Tax, Mandatory, Must, Others]
+                paidAmount:
+                  type: integer
+                  description: Amount of the expense which was already paid
+                plannedAmount:
+                  type: integer
+                  description: Amount of the expense planned at the beginning of the budget period
+                remainingAmount:
+                  type: integer
+                  description: Remaining amount of the expense. It is changing as the expense is being paid during the budget period.
+      responses:
+        200:
+          description: Success
+
+  /budget/expense/delete/{budgetid}:
+    put:
+      summary: Delete budget expense
+      tags:
+        - budget expense
+      parameters:
+        - in: path
+          name: budgetid
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the budget in which the expense is being deleted
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                expenseId:
+                  type: string
+                  description: ID of the expense being deleted
+      responses:
+        200:
+          description: Success
+
   /config/mandatoryExpenses/list:
     get:
       summary: Get list of Mandatory expenses
@@ -119,16 +329,77 @@ paths:
         - mandatory expenses
       responses:
         200:
-          description: Successful response
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/MandatoryExpense'
 
   /config/mandatoryExpenses/new:
     get:
-      summary: Add new mandatory expense
+      summary: Add new Mandatory expense
       tags:
         - mandatory expenses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                expenseName:
+                  type: string
+                expenseAmount:
+                  type: string
+                expenseAccount:
+                  type: string
+                  enum: [Unicredit, Revolut, Kreditka, Hotovost]
       responses:
         200:
-          description: Successful response
+          description: Success
+
+  /config/mandatoryExpenses/update/{id}:
+    get:
+      summary: Update Mandatory expense
+      description:
+      tags:
+        - mandatory expenses
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the Mandatory expense being updated
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/MandatoryExpense'
+      responses:
+        200:
+          description: Success
+
+  /config/mandatoryExpenses/delete/{id}:
+    get:
+      summary: Delete Mandatory expense
+      description:
+      tags:
+        - mandatory expenses
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the Mandatory expense being deleted
+      responses:
+        200:
+          description: Success
 
 components:
   schemas:
@@ -242,7 +513,6 @@ components:
           type: integer
           description: Remaining balance of the account after remaining amount of Tax, Mandatory, Must and Others expenses
 
-  requestBodies:
     NewBudget:
       type: object
       properties:
@@ -259,3 +529,16 @@ components:
         name:
           type: string
           description: Name of the budget to be updated
+
+    MandatoryExpense:
+      type: object
+      properties:
+        _id:
+          type: string
+        expenseName:
+          type: string
+        expenseAmount:
+          type: string
+        expenseAccount:
+          type: string
+          enum: [Unicredit, Revolut, Kreditka, Hotovost]
