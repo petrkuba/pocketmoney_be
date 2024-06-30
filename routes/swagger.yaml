@@ -1,13 +1,13 @@
 openapi: 3.0.0
 info:
-  title: Budget API
+  title: PocketMoney API
   version: 1.0.0
-  description: API for Pocketmoney frontend
+  description: API for PocketMoney application
 
 servers:
   - url: 'http://localhost:3001'
     description: 'Development server'
-  - url: 'http://localhost:3001'
+  - url: 'http://localhost/api/'
     description: 'Production server'
 
 paths:
@@ -19,7 +19,7 @@ paths:
         - budget
       responses:
         200:
-          description: Successful response
+          description: Success
           content:
             application/json:
               schema:
@@ -35,26 +35,81 @@ paths:
   /budget/{id}:
     get:
       summary: Get budget detail
+      description:
       tags:
         - budget
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: Budget ID
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
 
   /budget/new:
     post:
       summary: Add new budget
       tags:
         - budget
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestBodies/NewBudget'
+      responses:
+        200:
+          description: Success
 
   /budget/update/{id}:
     put:
       summary: Update existing budget
+      description:
       tags:
         - budget
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the budget to be updated
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestBodies/UpdateBudget'
+      responses:
+        200:
+          description: Success
 
   /budget/delete/{id}:
     delete:
       summary: Delete budget
+      description:
       tags:
         - budget
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the budget to be deleted
+      responses:
+        200:
+          description: Success
 
   /config/mandatoryExpenses/list:
     get:
@@ -74,3 +129,92 @@ paths:
       responses:
         200:
           description: Successful response
+
+components:
+  schemas:
+    Budget:
+      type: object
+      properties:
+        id:
+          type: object
+          description: ID of the budget
+        name:
+          type: string
+          description:
+        balances:
+          type: array
+          description: List of balances in the budget
+          items:
+            $ref: '#components/schemas/BudgetBalance'
+        expenses:
+          type: array
+          description: List of expected expenses in the budget
+          items:
+            $ref: '#components/schemas/BudgetExpense'
+
+    BudgetExpense:
+      type: object
+      description: Planned expense in the budget
+      properties:
+        id:
+          type: object
+          description: Budget expense ID
+        expenseName:
+          type: string
+          description: Budget expense name
+        expenseType:
+          type: string
+          description: Type of the expense
+          enum: [Tax, Mandatory, Must, Other]
+        expenseAccount:
+          type: string
+          description: Account (balance) from which the expense will be covered
+          enum: [Unicredit, Revolut, Kreditka, Hotovost]
+        plannedAmount:
+          type: integer
+          description: Planned amount of the expense at the beginning of the budget period
+        remainingAmount:
+          type: integer
+          description: Actual remaining amount of the expense in the budget. It is changing as the part (or whole) amount of the expense can be spent during the budget period.
+        paidAmount:
+          type: integer
+          description: Already paid amount of the expense
+
+    BudgetBalance:
+      type: object
+      description: Actual balance in the budget
+      properties:
+        id:
+          type: object
+          description: Budget balance ID
+        balanceName:
+          type: string
+          description: Name of the balance
+        account:
+          type: string
+          description: Account of the balance
+          enum: [Unicredit, Revolut, Kreditka, Hotovost]
+        currentBalance:
+          type: integer
+          description: Actual balance amount. It is changing during the budget period as the balance is being spent.
+        plannedBalance:
+          type: integer
+          description: Planned balance at the beginning of the budget period
+
+  requestBodies:
+    NewBudget:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the budget
+        addMandatoryExpenses:
+          type: boolean
+          description: If true Mandatory expenses defined in configuration are added to the budget.
+
+    UpdateBudget:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the budget to be updated

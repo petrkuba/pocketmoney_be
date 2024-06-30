@@ -46,7 +46,7 @@ mongo
 ### Build docker image from Dockerfile
 - run this command in project root:
 ```
-docker build -f be.Dockerfile -t pocketmoney-server:<tag> .
+docker build -f be.Dockerfile -t pocketmoney-server:2.2 .
 ```
 
 
@@ -56,7 +56,7 @@ docker run -d \
 -p 3001:3001 \
 --net pocketmoney-network \
 --name pocketmoney-be \
-pocketmoney-server:2.1
+pocketmoney-server:2.2
 ```
 - network must be the same as MongoDB is running in
 
