@@ -55,8 +55,8 @@ docker build -f be.Dockerfile -t pocketmoney-server:<tag> .
 docker run -d \
 -p 3001:3001 \
 --net pocketmoney-network \
---name pocketmoney-server \
-pocketmoney-server:<tag>
+--name pocketmoney-be \
+pocketmoney-server:2.1
 ```
 - network must be the same as MongoDB is running in
 

@@ -3,7 +3,6 @@ const router = express.Router();
 const getDB = require ('../db').getDB
 const ObjectId = require('../db').ObjectId
 const config = require('../config.js')
-const { v4: uuidv4 } = require('uuid');
 
 
 // Custom middleware function to control the request body in the adding new budget request
@@ -137,7 +136,8 @@ function getCumulativeRemainingBalanceAfterTaxMandatoryMustOthers(remainingBalan
     return remainingBalanceAfterTaxMandatoryMustOther;
 }
 
-function getMandatoryExpenses(){};
+
+
 
 //List
 router.get('/list', (req,res) => {
@@ -247,7 +247,6 @@ router.post('/new', validateNewBudgetRequestBody, (req, res) => {
                 } else {
                     console.log("No items found in the database");
                 }
-
                 return db.collection('budgets').insertOne(newBudget);
            })
            .then(result => {
@@ -270,7 +269,6 @@ router.post('/new', validateNewBudgetRequestBody, (req, res) => {
                 res.status(500).json({ error: 'An error occurred while inserting the budget' });
             });
     }
-
 });
 
 //Update

@@ -1,0 +1,57 @@
+openapi: 3.0.0
+info:
+  title: Budget API
+  version: 1.0.0
+  description: API for Pocketmoney frontend
+
+servers:
+  - url: 'http://localhost:3001'
+    description: 'Development server'
+  - url: 'http://localhost:3001'
+    description: 'Production server'
+
+paths:
+  /budget/list:
+    get:
+      summary: Get list of budgets
+      description: Returns list of budgets
+      tags:
+        - budget
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    name:
+                      type: string
+
+  /budget/{id}:
+    get:
+      summary: Get budget detail
+      tags:
+        - budget
+
+  /budget/new:
+    post:
+      summary: Add new budget
+      tags:
+        - budget
+
+  /budget/update/{id}:
+    put:
+      summary: Update existing budget
+      tags:
+        - budget
+
+  /budget/delete/{id}:
+    delete:
+      summary: Delete budget
+      tags:
+        - budget
