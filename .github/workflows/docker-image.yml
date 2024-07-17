@@ -25,4 +25,4 @@ jobs:
         name: Build the Docker image
         run: |
           docker build . --file be.Dockerfile --tag pocketmoney_be:$(date +%s)
-          docker push petrkuba/pocketmoney_be:$(date +%s)
+          docker push petrkuba/pk:pocketmoney_be
