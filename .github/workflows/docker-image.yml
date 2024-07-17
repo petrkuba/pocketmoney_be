@@ -1,4 +1,4 @@
-name: Docker Image CI
+.name: Docker Image CI
 
 on:
   push:
@@ -24,5 +24,5 @@ jobs:
       -
         name: Build the Docker image
         run: |
-          docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+          docker build . --file be.Dockerfile --tag pocketmoney_be:$(date +%s)
           docker push petrkuba/pocketmoney_be:latest
