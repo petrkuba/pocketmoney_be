@@ -26,3 +26,22 @@ jobs:
         run: |
           docker build . --file be.Dockerfile --tag petrkuba/pk:pocketmoney_be
           docker push petrkuba/pk:pocketmoney_be
+      -
+        name: Deploy to VM
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VM_HOST}}
+          username: ${{ secrets.VM_USERNAME }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            sudo docker pull petrkuba/pk:pocketmoney_be
+            sudo docker stop pocketmoney-be
+            sudo docker rm pocketmoney-be
+            sudo docker run -d \
+              -p 3001 \
+              -e MONGODB_DATABASE_NAME=pocketmoney \
+              --net pocketmoney-network \
+              --name pocketmoney-be \
+              petrkuba/pk:pocketmoney_be
+            
+          
