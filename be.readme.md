@@ -25,40 +25,31 @@ Note: run the commands in project root
 
 ## Local Docker env
 
-### Create mongodb in docker 
-Download mongo image
-```
-docker pull mongo
-```
-Run mongodb container
-```
-sudo docker run -d \
--p 27017:27017 \
--e MONGO_INITDB_ROOT_USERNAME=admin \
--e MONGO_INITDB_ROOT_PASSWORD=password \
---net pocketmoney-network \
--v pocketmoney-data:/data/db \
---name mongo-db \
-mongo
-```
---name must be same as the host in DB connection string in Dockerfile ENV
-
 ### Build docker image from Dockerfile
 - run this command in project root:
 ```
-docker build -f be.Dockerfile -t pocketmoney-server:2.2 .
+docker build -f be.Dockerfile -t pocketmoney-server:2.3 .
 ```
 
-
 ### Run application container
+locally
 ```
 docker run -d \
 -p 3001:3001 \
 --net pocketmoney-network \
 --name pocketmoney-be \
-pocketmoney-server:2.2
+pocketmoney-server:2.3
 ```
 - network must be the same as MongoDB is running in
+
+run on cloud VM
+```
+sudo docker run -d \
+-p 3001 \
+--net pocketmoney-network \
+--name pocketmoney-be \
+petrkuba/pk:pocketmoney_be
+```
 
 ### Deploy new version of application
 - create new application image

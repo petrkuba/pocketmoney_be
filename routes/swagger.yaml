@@ -64,7 +64,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#components/schemas/NewBudget'
+              properties:
+                name:
+                  type: string
+                  description: Name of the budget
+                addMandatoryExpenses:
+                  type: boolean
+                  description: If true Mandatory expenses defined in configuration are added to the budget.
       responses:
         200:
           description: Success
@@ -88,7 +94,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#components/schemas/UpdateBudget'
+              properties:
+                name:
+                  type: string
+                  description: Name of the budget to be updated
       responses:
         200:
           description: Success
@@ -115,7 +124,7 @@ paths:
     put:
       summary: Add new balance to the budget
       tags:
-        - budget balance
+        - budget/balance
       parameters:
         - in: path
           name: budgetid
@@ -148,7 +157,7 @@ paths:
     put:
       summary: Update budget balance
       tags:
-        - budget balance
+        - budget/balance
       parameters:
         - in: path
           name: budgetid
@@ -184,7 +193,7 @@ paths:
     put:
       summary: Delete budget balance
       tags:
-        - budget balance
+        - budget/balance
       parameters:
         - in: path
           name: budgetid
@@ -210,7 +219,7 @@ paths:
     put:
       summary: Add budget expense
       tags:
-        - budget expense
+        - budget/expense
       parameters:
         - in: path
           name: budgetid
@@ -253,7 +262,7 @@ paths:
     put:
       summary: Update budget expense
       tags:
-        - budget expense
+        - budget/expense
       parameters:
         - in: path
           name: budgetid
@@ -299,7 +308,7 @@ paths:
     put:
       summary: Delete budget expense
       tags:
-        - budget expense
+        - budget/expense
       parameters:
         - in: path
           name: budgetid
@@ -326,7 +335,7 @@ paths:
       summary: Get list of Mandatory expenses
       description: Returns list of mandatory expenses
       tags:
-        - mandatory expenses
+        - config/mandatoryExpenses
       responses:
         200:
           description: Success
@@ -338,10 +347,10 @@ paths:
                   $ref: '#components/schemas/MandatoryExpense'
 
   /config/mandatoryExpenses/new:
-    get:
+    post:
       summary: Add new Mandatory expense
       tags:
-        - mandatory expenses
+        - config/mandatoryExpenses
       requestBody:
         required: true
         content:
@@ -360,11 +369,11 @@ paths:
           description: Success
 
   /config/mandatoryExpenses/update/{id}:
-    get:
+    put:
       summary: Update Mandatory expense
       description:
       tags:
-        - mandatory expenses
+        - config/mandatoryExpenses
       parameters:
         - in: path
           name: id
@@ -384,11 +393,11 @@ paths:
           description: Success
 
   /config/mandatoryExpenses/delete/{id}:
-    get:
+    delete:
       summary: Delete Mandatory expense
       description:
       tags:
-        - mandatory expenses
+        - config/mandatoryExpenses
       parameters:
         - in: path
           name: id
@@ -400,6 +409,82 @@ paths:
       responses:
         200:
           description: Success
+
+  /config/monthlyExpenses/list:
+    get:
+      summary: Returns list of ordinary expenses planned in the budget
+      tags:
+        - config/monthlyExpenses
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/MonthlyExpense'
+
+  /config/monthlyExpenses/new:
+    post:
+      summary: Creates new planned repeating monthly expense
+      tags:
+        - config/monthlyExpenses
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/MonthlyExpense'
+      responses:
+        200:
+          description: Success
+
+  /config/monthlyExpenses/update/{id}:
+    put:
+      summary: Updates repeating monthly expense
+      tags:
+        - config/monthlyExpenses
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the Monthly expense being updated
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/MonthlyExpense'
+      responses:
+        200:
+          description: Success
+        400:
+          description: Wrong ID in path
+
+  /config/monthlyExpenses/delete/{id}:
+    delete:
+      summary: Deletes Monthly repeating expense
+      tags:
+        - config/monthlyExpenses
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the Monthly expense being deleted
+      responses:
+        200:
+          description: Success
+        400:
+          description: Wrong ID in path
+        500:
+          description: Error when deleting expense
 
 components:
   schemas:
@@ -427,7 +512,7 @@ components:
 
     BudgetBalancesSums:
       type: object
-      description: Sums of planned and remaining balances over all accounts.
+      description: Sums of planned and remaining balances over all accounts. And cumulative remaining balances after expense types amounts.
       properties:
         plannedBalanceSum:
           type: integer
@@ -454,7 +539,7 @@ components:
 
     BudgetExpense:
       type: object
-      description: Planned expense in the budget
+      description: Expense in the concrete budget
       properties:
         id:
           type: object
@@ -482,7 +567,7 @@ components:
 
     BudgetBalance:
       type: object
-      description: Actual balance in the budget
+      description: Actual balance in the concrete budget
       properties:
         id:
           type: object
@@ -513,32 +598,75 @@ components:
           type: integer
           description: Remaining balance of the account after remaining amount of Tax, Mandatory, Must and Others expenses
 
-    NewBudget:
+    MonthlyExpense:
       type: object
-      properties:
-        name:
-          type: string
-          description: Name of the budget
-        addMandatoryExpenses:
-          type: boolean
-          description: If true Mandatory expenses defined in configuration are added to the budget.
-
-    UpdateBudget:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Name of the budget to be updated
-
-    MandatoryExpense:
-      type: object
+      description: It is the repeating expense in every monthly budget
       properties:
         _id:
           type: string
-        expenseName:
+        name:
           type: string
-        expenseAmount:
+        amount:
           type: string
-        expenseAccount:
+        account:
           type: string
+          description:
           enum: [Unicredit, Revolut, Kreditka, Hotovost]
+        type:
+          type: string
+          description:
+            - Mandatory - it is monthly repeating expense which must be paid (e.g. rent).
+            - Must - it is planned expense or expense category which will have to be paid within the monthly budget. Its amount can change (e.g. groceries)
+          enum: [Mandatory, Must]
+
+    Account:
+      type: object
+      description:
+        - It is any asset that holds balance and can be used for spendings (e.g. current account, cash, credit card ...)
+        - Accounts are used in budget as the holders of balances
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        balance:
+          type: integer
+        currency:
+          type: string
+
+    SavingsAsset:
+      type: object
+      description: It is any asset used for savings
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        balance:
+          type: integer
+        currency:
+          type: string
+        regularSavings:
+          type: integer
+
+    Transaction:
+      type: object
+      description: It is any financial movement on the asset (i.e. account or savings asset)
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        amount:
+          type: integer
+        currency:
+          type: string
+        date:
+          type: string
+          format: date
+        type:
+          type: string
+          enum: [debit, credit, transfer]
+        account:
+          type: string
+          enum: [Unicredit, Revolut, Kreditka, Hotovost, ...]
