@@ -1,11 +1,13 @@
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const budgetRouter = require ('./routes/budgetRouter')
+const budgetRouter = require ('./routes/budget/budgetRouter')
 const mockRouter = require ('./routes/mockRouter')
-const configRouter = require ('./routes/configRouter')
-const balanceRouter = require('./routes/balanceRouter')
-const expenseRouter = require('./routes/expenseRouter')
+const mandatoryExpensesRouter = require ('./routes/config/mandatoryExpensesRouter')
+const expenseTypesRouter = require ('./routes/config/expenseTypesRouter')
+const balanceRouter = require('./routes/budget/balanceRouter')
+const expenseRouter = require('./routes/budget/expenseRouter')
+const accountsRouter = require('./routes/accountsRouter')
 const mongoConnect = require ('./db').mongoConnect
 const swaggerUI = require('swagger-ui-express');
 const {swaggerSpec} = require('./swagger');
@@ -21,7 +23,9 @@ app.use('/budget', budgetRouter)
 app.use('/budget/balance', balanceRouter)
 app.use('/budget/expense', expenseRouter)
 app.use('/mock', mockRouter)
-app.use('/config', configRouter)
+app.use('/config/mandatoryExpenses', mandatoryExpensesRouter)
+app.use('/config/expenseTypes', expenseTypesRouter)
+app.use('/accounts', accountsRouter)
 
 //Root route - must be at the end
 app.use('/', (req, res) =>

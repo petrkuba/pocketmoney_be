@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const getDB = require ('../db').getDB
-const ObjectId = require('../db').ObjectId
-const config = require('../config.js')
+const getDB = require ('../../db').getDB
+const ObjectId = require('../../db').ObjectId
+const config = require('../../config.js')
 
 
 // Custom middleware function to control the request body in the adding new budget request

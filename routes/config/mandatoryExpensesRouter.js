@@ -1,16 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const getDB = require ('../db').getDB
-const ObjectId = require('../db').ObjectId
-const config = require('../config.js')
+const getDB = require ('../../db').getDB
+const ObjectId = require('../../db').ObjectId
+const config = require('../../config.js')
 
 router.get('/expense-types', (req, res) => {
     res.json(config.expenseTypes);
 })
 
-router.get('/accounts', (req, res) => {
-    res.json(config.accounts);
-})
 
 //MANDATORY EXPENSES
 
@@ -35,7 +32,7 @@ function validateNewUpdateRequest(req, res, next) {
 }
 
 //List
-router.get('/mandatoryExpenses/list', (req, res) => {
+router.get('/list', (req, res) => {
    const db = getDB();
    db.collection('mandatoryExpenses')
        .find({}, {projection:{_id:1, expenseName:1, expenseAmount:1, expenseAccount:1}})
@@ -47,22 +44,28 @@ router.get('/mandatoryExpenses/list', (req, res) => {
 })
 
 //New
-router.post('/mandatoryExpenses/new', validateNewUpdateRequest, (req, res) => {
+router.post('/new', validateNewUpdateRequest, (req, res) => {
 
     const newMandatoryExpense = req.body;
     const db = getDB();
     db.collection('mandatoryExpenses')
         .insertOne(newMandatoryExpense)
         .then(result => {
+            // Get the newly inserted account with the insertedId
+            return db.collection('mandatoryExpenses').findOne({ _id: result.insertedId });
+        })
+        .then(insertedExpense => {
+            res.json(insertedExpense); // Send the newly inserted account data back to the client
+        })
+/*        .then(result => {
             const insertedId = result.insertedId;
             res.json({ insertedId });
         })
-        .catch(error => console.error('Error inserting Mandatory expense', error));
-
+*/        .catch(error => console.error('Error inserting Mandatory expense', error));
 })
 
 //Update
-router.put('/mandatoryExpenses/update/:id', validateNewUpdateRequest, (req, res) => {
+router.put('/update/:id', validateNewUpdateRequest, (req, res) => {
 
     const expenseid = req.params.id;
 
@@ -97,7 +100,7 @@ router.put('/mandatoryExpenses/update/:id', validateNewUpdateRequest, (req, res)
 });
 
 //Delete
-router.delete('/mandatoryExpenses/delete/:id', (req, res) => {
+router.delete('/delete/:id', (req, res) => {
   const expenseId = req.params.id;
   const db = getDB();
 
@@ -149,9 +152,16 @@ router.post('/monthlyExpenses/new', validateNewUpdateMonthlyExpenseRequest, (req
     db.collection('monthlyExpenses')
         .insertOne(newMonthlyExpense)
         .then(result => {
-            const insertedId = result.insertedId;
-            res.json({ insertedId });
+            // Get the newly inserted account with the insertedId
+            return db.collection('monthlyExpenses').findOne({ _id: result.insertedId });
         })
+        .then(insertedExpense => {
+            res.json(insertedExpense); // Send the newly inserted account data back to the client
+        })
+ //       .then(result => {
+ //           const insertedId = result.insertedId;
+//           res.json({ insertedId });
+//        })
         .catch(error => console.error('Error inserting Monthly expense', error));
 });
 

@@ -6,9 +6,9 @@ info:
 
 servers:
   - url: 'http://localhost:3001'
-    description: 'Development server'
+    description: 'localhost'
   - url: 'http://34.170.36.196/api/'
-    description: 'Production server'
+    description: 'Google cloud'
 
 paths:
   /budget/list:
@@ -332,8 +332,8 @@ paths:
 
   /config/mandatoryExpenses/list:
     get:
-      summary: Get list of Mandatory expenses
-      description: Returns list of mandatory expenses
+      summary: Get list of Mandatory monthly expenses
+      description: Returns list of mandatory monthly expenses
       tags:
         - config/mandatoryExpenses
       responses:
@@ -486,6 +486,114 @@ paths:
         500:
           description: Error when deleting expense
 
+  /accounts/list:
+    get:
+      summary: Returns list of accounts
+      tags:
+        - accounts
+      responses:
+        200:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items: '#components/schemas/Account'
+
+  /accounts/{id}:
+    get:
+      summary: Returns account detail
+      tags:
+        - accounts
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: Account ID
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+
+  /accounts/new:
+    post:
+      summary: Add new account
+      tags:
+        - accounts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                  description: Name of the account
+                type:
+                  type: string
+                  description: Type of the account (enum)
+                currency:
+                  type: string
+                  description: Enum
+                balance:
+                  type: string
+                  description:
+      responses:
+        200:
+          description: Success
+
+  /accounts/update/{id}:
+    put:
+      summary: Updates account
+      tags:
+        - accounts
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Account'
+      responses:
+        200:
+          description: Success
+        400:
+          description: Wrong ID in path
+
+  /accounts/delete/{id}:
+    delete:
+      summary: Deletes account
+      tags:
+        - accounts
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the account being deleted
+      responses:
+        200:
+          description: Success
+        400:
+          description: Wrong ID in path
+        500:
+          description: Error when deleting account
+
 components:
   schemas:
     Budget:
@@ -629,6 +737,9 @@ components:
           type: string
         name:
           type: string
+        type:
+          type: string
+          description: Account type (e.g. current, savings ...)
         balance:
           type: integer
         currency:

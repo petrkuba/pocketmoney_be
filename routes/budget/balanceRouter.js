@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const getDB = require ('../db').getDB
-const ObjectId = require('../db').ObjectId
+const getDB = require ('../../db').getDB
+const ObjectId = require('../../db').ObjectId
 
 function validateAddBalanceRequestBody(req, res, next) {
 
