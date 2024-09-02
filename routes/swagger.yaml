@@ -410,82 +410,6 @@ paths:
         200:
           description: Success
 
-  /config/monthlyExpenses/list:
-    get:
-      summary: Returns list of ordinary expenses planned in the budget
-      tags:
-        - config/monthlyExpenses
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#components/schemas/MonthlyExpense'
-
-  /config/monthlyExpenses/new:
-    post:
-      summary: Creates new planned repeating monthly expense
-      tags:
-        - config/monthlyExpenses
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#components/schemas/MonthlyExpense'
-      responses:
-        200:
-          description: Success
-
-  /config/monthlyExpenses/update/{id}:
-    put:
-      summary: Updates repeating monthly expense
-      tags:
-        - config/monthlyExpenses
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            minimum: 1
-          description: ID of the Monthly expense being updated
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#components/schemas/MonthlyExpense'
-      responses:
-        200:
-          description: Success
-        400:
-          description: Wrong ID in path
-
-  /config/monthlyExpenses/delete/{id}:
-    delete:
-      summary: Deletes Monthly repeating expense
-      tags:
-        - config/monthlyExpenses
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-            minimum: 1
-          description: ID of the Monthly expense being deleted
-      responses:
-        200:
-          description: Success
-        400:
-          description: Wrong ID in path
-        500:
-          description: Error when deleting expense
-
   /accounts/list:
     get:
       summary: Returns list of accounts
@@ -498,7 +422,8 @@ paths:
             application/json:
               schema:
                 type: array
-                items: '#components/schemas/Account'
+                items:
+                  $ref: '#components/schemas/Account'
 
   /accounts/{id}:
     get:
