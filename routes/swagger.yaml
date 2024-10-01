@@ -330,6 +330,23 @@ paths:
         200:
           description: Success
 
+  /budget/expense/pay/{expenseId}:
+    put:
+      summary: Pay budget expense
+      tags:
+        - budget/expense
+      parameters:
+        - in: path
+          name: expenseId
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: ID of the expense being paid
+      responses:
+        200:
+          description: Success
+
   /config/mandatoryExpenses/list:
     get:
       summary: Get list of Mandatory monthly expenses

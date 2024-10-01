@@ -165,4 +165,54 @@ router.put('/delete/:budgetid', validateDeleteUpdateExpenseRequestBody, (req, re
         });
 });
 
+router.put('/pay/:expenseId', (req, res) => {
+    const db = getDB();
+    const expenseId = req.params.expenseId;
+
+    //Retrieve the budget from the database
+    db.collection('budgets')
+        .findOne({ 'expenses._id': new ObjectId(expenseId) })
+        .then(budget => {
+            if (!budget) {
+                return res.status(404).json({ error: 'Budget not found' });
+            }
+            //get the remainingAmount and expenseAccount of the expense
+            const expenseIndex = budget.expenses.findIndex(expense => expense._id.toString() === expenseId);
+            const expenseRemainingAmount = budget.expenses[expenseIndex].remainingAmount;
+            const expenseAccount = budget.expenses[expenseIndex].expenseAccount;
+
+            //Update remainingAmount and paidAmount of the expense
+            budget.expenses[expenseIndex].remainingAmount = 0;
+            budget.expenses[expenseIndex].paidAmount = expenseRemainingAmount;
+
+            //Update the account balance
+            const balanceIndex = budget.balances.findIndex(balance =>
+                balance.account === budget.expenses[expenseIndex].expenseAccount
+                ||
+                balance.balanceName === budget.expenses[expenseIndex].expenseAccount
+                );
+            budget.balances[balanceIndex].currentBalance = budget.balances[balanceIndex].currentBalance - expenseRemainingAmount;
+
+            //Update the budget in the database
+           db.collection('budgets')
+                .updateOne(
+                    { _id: budget._id },
+                    { $set: { expenses: budget.expenses, balances: budget.balances } }
+                )
+                .then(result => {
+                    if (result.modifiedCount === 1) {
+                        res.json({expenseId});
+                    } else {
+                        res.status(500).json({ error: 'An error occurred while updating the budget' });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating budget:', error);
+                    res.status(500).json({ error: 'An error occurred while updating the budget' });
+                });
+
+        })
+    }
+);
+
 module.exports = router;
