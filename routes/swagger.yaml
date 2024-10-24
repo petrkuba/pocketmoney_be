@@ -9,6 +9,8 @@ servers:
     description: 'localhost'
   - url: 'http://34.170.36.196/api/'
     description: 'Google cloud'
+  - url:  'http://10.0.1.41:30080'
+    description: homeserver
 
 paths:
   /budget/list:

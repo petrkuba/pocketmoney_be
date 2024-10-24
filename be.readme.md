@@ -28,7 +28,7 @@ Note: run the commands in project root
 ### Build docker image from Dockerfile
 - run this command in project root:
 ```
-docker build -f be.Dockerfile -t pocketmoney-server:2.3 .
+docker build -f be.Dockerfile -t pocketmoney-server:2.4 .
 ```
 
 ### Run application container
@@ -38,7 +38,7 @@ docker run -d \
 -p 3001:3001 \
 --net pocketmoney-network \
 --name pocketmoney-be \
-pocketmoney-server:2.3
+pocketmoney-server:2.4
 ```
 - network must be the same as MongoDB is running in
 
